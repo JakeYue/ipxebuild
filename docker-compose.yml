@@ -1,0 +1,42 @@
+version: "3.8"
+services:
+  dhcp:
+    container_name: dhcp-server
+    image: modularitycontainers/dhcp-server
+    network_mode: "host"
+    volumes: 
+      - "/conf_data/dhcp/dhcpd.conf:/etc/dhcp/dhcpd.conf"
+      - "/conf_data/dhcp/dhcpd.leases:/etc/dhcp/dhcpd.leases:rw"  
+    command: ["dhcpd","-f"]
+
+  nginx:
+    container_name: http-server
+    image: nginx
+    ports: 
+      - "8080:80"
+    volumes: 
+      - "/conf_data/nginx/nginx.conf:/etc/nginx/nginx.conf"
+      - "/sharefile:/sharefile"
+      - "/IPXE:/IPXE"
+    command: ["nginx","-g","daemon off;"]
+
+  smb:
+    container_name: samba-server
+    image: dperson/samba
+    ports:
+      - "137:137"
+      - "138:138"
+      - "139:139"
+      - "445:445"
+    volumes: 
+      - "/conf_data/samba/smb.conf:/etc/samba/smb.conf"
+      - "/windows:/windows"
+    command: ["bash", "-c", "nmbd -D && smbd -F </dev/null"]
+  tftp:
+    container_name: tftp-boot
+    image: pghalliday/tftp
+    network_mode: "host"
+    volumes: 
+      - "/conf_data/tftp/tftp:/etc/xinetd.d/tftp"
+      - "/tftpboot:/var/tftpboot:rw"
+    

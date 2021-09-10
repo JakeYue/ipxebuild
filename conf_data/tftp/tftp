@@ -1,0 +1,13 @@
+service tftp
+{
+       disable = no
+       socket_type             = dgram
+       protocol                = udp
+       wait                    = yes
+       user                    = root
+       server                  = /usr/sbin/in.tftpd
+       server_args             = -u root -s /tftpboot -c #指定tftp服务器的目录，-c为指定为可以创建文件
+       per_source              = 11
+       cps                     = 100 2
+       flags                   = IPv4
+}
